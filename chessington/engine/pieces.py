@@ -35,7 +35,33 @@ class Pawn(Piece):
     """
 
     def get_available_moves(self, board):
-        return []
+        position = board.find_piece(self)
+        piece = board.get_piece(position)
+        moves = []
+        if piece.player == Player.WHITE:
+            direction = 1
+            start_row = 1
+        elif piece.player == Player.BLACK:
+            direction = -1
+            start_row = 6
+
+        move = Square.at(position.row + direction, position.col)
+        if board.check_square_is_available(move):
+            moves.append(move)
+            if position.row == start_row:
+                move = Square.at(position.row + 2 * direction, position.col)
+                if board.check_square_is_available(move):
+                    moves.append(move)
+
+        capture_moves = [
+            Square.at(position.row + direction, position.col + direction),
+            Square.at(position.row + direction, position.col - direction)
+        ]
+        for move in capture_moves:
+            if board.check_square_has_opponent_piece(move, piece.player):
+                moves.append(move)
+
+        return moves
 
 
 class Knight(Piece):
@@ -80,4 +106,15 @@ class King(Piece):
     """
 
     def get_available_moves(self, board):
-        return []
+        position = board.find_piece(self)
+        piece = board.get_piece(position)
+        directions = [-1, 0, 1]
+        moves = []
+        for i in directions:
+            for j in directions:
+                move = Square.at(position.row + i, position.col + j)
+                if (board.check_square_is_available(move) or 
+                board.check_square_has_opponent_piece(move, piece.player)):
+                    moves.append(move)
+
+        return moves

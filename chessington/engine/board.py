@@ -77,3 +77,34 @@ class Board:
             self.set_piece(to_square, moving_piece)
             self.set_piece(from_square, None)
             self.current_player = self.current_player.opponent()
+
+    def check_square_on_board(self, square):
+        if square.row >= BOARD_SIZE or square.row <= -1:
+            return False
+        elif square.col >= BOARD_SIZE or square.col <= -1:
+            return False
+        else:
+            return True
+
+    def check_square_is_available(self, square):
+        if self.check_square_on_board(square):
+            if self.get_piece(square):
+                return False
+            else:
+                return True
+        return False
+
+    def check_square_has_opponent_piece(self, square, piece_player):
+        if piece_player == Player.BLACK:
+            opponent = Player.WHITE
+        elif piece_player == Player.WHITE:
+            opponent = Player.BLACK
+
+        if self.check_square_on_board(square):
+            piece = self.get_piece(square)
+            if piece and piece.player == opponent:
+                return True
+            else: 
+                return False
+        else: 
+            return False

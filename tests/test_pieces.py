@@ -1,6 +1,6 @@
 from chessington.engine.board import Board
 from chessington.engine.data import Player, Square
-from chessington.engine.pieces import Pawn
+from chessington.engine.pieces import Pawn, King
 
 class TestPawns:
 
@@ -331,3 +331,93 @@ class TestPawns:
         # Assert
         assert Square.at(2, 3) not in moves
         assert Square.at(2, 5) not in moves
+
+    @staticmethod
+    def test_king_can_move_one_sqaure_in_all_directions():
+
+        # Arrange
+        board = Board.empty()
+        king = King(Player.BLACK)
+        king_square = Square.at(3, 3)
+        board.set_piece(king_square, king)
+
+         # Act
+        moves = king.get_available_moves(board)
+
+        # Assert
+        assert Square.at(4, 2) in moves
+        assert Square.at(4, 3) in moves
+        assert Square.at(4, 4) in moves
+        assert Square.at(3, 2) in moves
+        assert Square.at(3, 4) in moves
+        assert Square.at(2, 2) in moves
+        assert Square.at(2, 3) in moves
+        assert Square.at(2, 4) in moves
+
+    @staticmethod
+    def test_king_cannot_move_if_surrounded_by_friendly_pieces():
+
+        # Arrange
+        board = Board.empty()
+        king = King(Player.BLACK)
+        king_square = Square.at(3, 3)
+        board.set_piece(king_square, king)
+
+        friendly_square = [
+            Square.at(4, 2), Square.at(4, 3),
+            Square.at(4, 4), Square.at(3, 2),
+            Square.at(3, 4), Square.at(2, 2),
+            Square.at(2, 3), Square.at(2, 4)
+        ]
+        for square in friendly_square:
+            board.set_piece(square, Pawn(Player.BLACK))
+
+        # Act
+        moves = king.get_available_moves(board)
+
+        # Assert
+        assert Square.at(4, 2) not in moves
+        assert Square.at(4, 3) not in moves
+        assert Square.at(4, 4) not in moves
+        assert Square.at(3, 2) not in moves
+        assert Square.at(3, 4) not in moves
+        assert Square.at(2, 2) not in moves
+        assert Square.at(2, 3) not in moves
+        assert Square.at(2, 4) not in moves
+
+    @staticmethod
+    def test_king_can_take_enemy_piece():
+
+        # Arrange
+        board = Board.empty()
+        king = King(Player.BLACK)
+        king_square = Square.at(3, 3)
+        board.set_piece(king_square, king)
+
+        enemy_square = Square.at(2, 4)
+        board.set_piece(enemy_square, Pawn(Player.WHITE))
+
+        # Act
+        moves = king.get_available_moves(board)
+
+        # Assert
+        assert Square.at(2, 4) in moves
+
+    @staticmethod
+    def test_king_cannot_move_off_the_board():
+
+        # Arrange
+        board = Board.empty()
+        king = King(Player.BLACK)
+        king_square = Square.at(0, 0)
+        board.set_piece(king_square, king)
+
+        # Act
+        moves = king.get_available_moves(board)
+
+        # Assert
+        assert Square.at(-1, 1) not in moves
+        assert Square.at(-1, 0) not in moves
+        assert Square.at(-1, -1) not in moves
+        assert Square.at(0, -1) not in moves
+        assert Square.at(1, -1) not in moves
